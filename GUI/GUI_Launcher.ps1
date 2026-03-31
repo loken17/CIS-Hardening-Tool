@@ -46,6 +46,9 @@ Add-Type -AssemblyName PresentationFramework
     <Button Name="btnUndo"     Content="↩  Undo Hardening"
             Height="48" Margin="0,5" Background="#f38ba8"
             FontWeight="Bold" FontSize="13" Cursor="Hand"/>
+    <Button Name="btnPDF" Content="📄  Import CIS PDF"
+        Height="48" Margin="0,5" Background="#94e2d5"
+        FontWeight="Bold" FontSize="13" Cursor="Hand"/>
 
     <TextBlock Text="Activity Log:" Foreground="#6c7086"
                Margin="0,15,0,5" FontSize="11"/>
@@ -89,4 +92,67 @@ $window.FindName("btnAudit").Add_Click({
         Write-Log "✅ Report saved to Reports\report.txt"
     } catch {
         Write-Log "❌ Error: $_"
-    
+    }
+})
+
+$window.FindName("btnExport").Add_Click({
+    Write-Log "Exporting GPO backup..."
+    try {
+        Export-GPO
+        Write-Log "✅ GPO exported to Profiles\GPO_Backup"
+    } catch {
+        Write-Log "❌ Error: $_"
+    }
+})
+
+$window.FindName("btnImport").Add_Click({
+    Write-Log "Importing GPO backup..."
+    try {
+        Import-GPO
+        Write-Log "✅ GPO imported and applied!"
+    } catch {
+        Write-Log "❌ Error: $_"
+    }
+})
+
+$window.FindName("btnProfiles").Add_Click({
+    $profiles = Get-ChildItem "$PSScriptRoot\..\Profiles\*.json" -ErrorAction SilentlyContinue |
+                Select-Object -ExpandProperty BaseName
+    if ($profiles) {
+        Write-Log "📋 Profiles found:`n  - $($profiles -join "`n  - ")"
+    } else {
+        Write-Log "⚠ No profiles found in Profiles folder."
+    }
+})
+
+$window.FindName("btnUndo").Add_Click({
+    Write-Log "Undoing hardening settings..."
+    try {
+        & "$PSScriptRoot\..\Scripts\Undo_Harden.ps1"
+        Write-Log "✅ Settings restored to default!"
+    } catch {
+        Write-Log "❌ Error: $_"
+    }
+})
+
+$window.FindName("btnPDF").Add_Click({
+    # Open file picker dialog
+    Add-Type -AssemblyName System.Windows.Forms
+    $dialog = New-Object System.Windows.Forms.OpenFileDialog
+    $dialog.Filter = "PDF Files (*.pdf)|*.pdf"
+    $dialog.Title  = "Select CIS Benchmark PDF"
+
+    if ($dialog.ShowDialog() -eq "OK") {
+        $pdfPath = $dialog.FileName
+        $profileName = "CIS-Import-$(Get-Date -Format 'yyyyMMdd-HHmm')"
+        Write-Log "Parsing PDF: $pdfPath"
+        try {
+            $result = python "$PSScriptRoot\..\parse_cis_pdf.py" $pdfPath $profileName
+            Write-Log "✅ $result"
+        } catch {
+            Write-Log "❌ Error: $_"
+        }
+    }
+})
+
+$window.ShowDialog()
