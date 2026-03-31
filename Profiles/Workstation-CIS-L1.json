@@ -1,0 +1,13 @@
+{
+  "ProfileName": "Workstation-CIS-Level1",
+  "Version": "1.0",
+  "CreatedDate": "2026-03-31",
+  "Settings": [
+    { "Category": "Password",  "Name": "MinPasswordLength",   "Value": "8",  "CIS_Ref": "1.1.4" },
+    { "Category": "Lockout",   "Name": "LockoutThreshold",    "Value": "5",  "CIS_Ref": "1.2.1" },
+    { "Category": "Lockout",   "Name": "LockoutDuration",     "Value": "15", "CIS_Ref": "1.2.2" },
+    { "Category": "Firewall",  "Name": "EnableAllProfiles",   "Value": "True","CIS_Ref": "9.1.1" },
+    { "Category": "USB",       "Name": "DisableUSBStorage",   "Value": "4",  "CIS_Ref": "18.3.1" },
+    { "Category": "Accounts",  "Name": "DisableGuestAccount", "Value": "No", "CIS_Ref": "2.3.1" }
+  ]
+}
